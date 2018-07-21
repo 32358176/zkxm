@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+<script>
+    load();
+    function load() {
+        $.ajax({
+            xhrFields:{
+                withCredentials:true
+            },
+            type:"get",
+            url:"http://127.0.0.1:8080/user/queryAllUsers",
+            data:{
+                page:1,
+                limit:10
+            },
+            dataType:"json",
+            success:function (res) {
+                alert(JSON.stringify(res))
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

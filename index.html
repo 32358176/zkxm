@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>川汇区畜牧局业务系统</title>
+    <link rel="stylesheet" type="text/css" href="js/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="js/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="js/easyui/demo/demo.css">
+    <link rel="stylesheet" type="text/css" href="js/zTree/css/zTreeStyle/zTreeStyle.css"/>
+    <link rel="stylesheet" type="text/css" href="js/zTree/css/demo.css"/>
+    <script type="text/javascript" src="js/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="js/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="js/zTree/js/jquery.ztree.core.js"></script>
+    <link rel="stylesheet" href="js/layui/css/layui.css" media="all">
+</head>
+<body style="margin: 0; padding: 0">
+<div class="easyui-layout" style="width:100%;height:750px;">
+    <div data-options="region:'north'" style="height:50px"><h1>欢迎使用畜牧局业务系统</h1></div>
+    <div data-options="region:'west',split:true" title="菜单" style="width:180px;" id="west_navi">
+        <ul id="myTree" class="ztree" style="height: 550px"></ul>
+        <button class="layui-btn layui-btn-danger" id="quit" style="margin-left: 40px">退出登录</button>
+    </div>
+    <div data-options="region:'center',iconCls:'icon-ok'" title="操作页面">
+        <div id="tt" class="easyui-tabs" fit="true">
+        </div>
+    </div>
+</div>
+<script src="js/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript">
+
+    //    var webSocket;
+    //    layui.use(['form', 'layedit', 'laydate'], function() {
+    //        $(function () {
+    //            webSocket = new WebSocket("ws://192.168.1.53:8080/soc");
+    //            webSocket.onmessage = function (event) {
+    //                layui.layer.alert("群发公告:" + event.data,{icon:6})
+    //            }
+    //        })
+    //    });
+
+    var setting = {
+
+        data: { //数据配置
+            key: {
+                name: "modulename"
+            },
+            simpleData: { //简单数据模式
+                enable: true, //是否启用简单数据模式
+                idKey: "id", //设置节点id属性名
+                pIdKey: "parentid", //设置父节点属性名
+                rootPId: 0 //设置根节点，默认值null
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, treeNode) {
+
+                if ($('#tt').tabs('exists', treeNode.modulename)) {
+                    $('#tt').tabs('select', treeNode.modulename);
+                } else {
+                    var content = '<iframe scrolling="auto" frameborder="0"  src="' + treeNode.path + '" style="width:100%;height:100%;"></iframe>';
+                    $('#tt').tabs('add', {
+                        title: treeNode.modulename,
+                        content: content,
+                        closable: true,
+                    });
+                }
+
+            },
+        }
+
+    };
+
+
+    loadUserModule();
+
+    function loadUserModule() {
+        var user = JSON.parse(sessionStorage.getItem("user"));
+        $.ajax({
+            xhrFields: {
+                withCredentials: true
+            },
+            type: "post",
+            url: "http://127.0.0.1:8080/modules/selectModulesByUserId",
+            data: {
+                userId: user.id
+            },
+            dataType: "json",
+            success: function (res) {
+                $.fn.zTree.init($("#myTree"), setting, res);
+            }
+        });
+
+    }
+
+$("#quit").click(function () {
+    $.ajax({
+        xhrFields: {
+            withCredentials: true
+        },
+        type:"get",
+        url:"http://127.0.0.1:8080/login/logout",
+        success:function (res) {
+//            if(res.code == 200){
+                window.location.href = "login.html"
+//            }else{
+//               alert(res.msg)
+//            }
+        }
+    })
+})
+</script>
+</body>
+</html>
